@@ -1,0 +1,81 @@
+name: axon-fitness
+x-api-environment: &api-environment
+  NODE_ENV: production
+  HOST: 0.0.0.0
+  PORT: 3000
+  DATABASE_URL: postgresql://axon:${POSTGRES_PASSWORD:?required}@db:5432/axon
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?required}
+  BETTER_AUTH_URL: https://${APP_DOMAIN:?required}
+  PUBLIC_APP_URL: https://${APP_DOMAIN:?required}
+  EMAIL_PROVIDER: resend
+  RESEND_API_KEY: ${RESEND_API_KEY:?required}
+  EMAIL_FROM: ${EMAIL_FROM:?required}
+  EMAIL_DAILY_LIMIT: ${EMAIL_DAILY_LIMIT:-90}
+  EMAIL_MONTHLY_LIMIT: ${EMAIL_MONTHLY_LIMIT:-2900}
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: axon
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+      POSTGRES_DB: axon
+    volumes: ["axon-db:/var/lib/postgresql/data"]
+    networks: [private]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U axon -d axon"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 768m
+  migrate:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    command: ["node", "--import", "tsx", "apps/api/src/migrate.ts"]
+    environment: *api-environment
+    networks: [private]
+    depends_on:
+      db: { condition: service_healthy }
+    restart: "no"
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    environment: *api-environment
+    networks: [private]
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    mem_limit: 512m
+  web:
+    build:
+      context: .
+      dockerfile: apps/mobile/Dockerfile
+      args:
+        EXPO_PUBLIC_API_URL: https://${APP_DOMAIN:?required}
+    restart: unless-stopped
+    networks: [private, edge]
+    depends_on:
+      api: { condition: service_healthy }
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK:?required}
+      traefik.http.routers.axon-fitness.rule: Host(`${APP_DOMAIN:?required}`)
+      traefik.http.routers.axon-fitness.entrypoints: websecure
+      traefik.http.routers.axon-fitness.tls: "true"
+      traefik.http.routers.axon-fitness.tls.certresolver: ${TRAEFIK_CERTRESOLVER:?required}
+      traefik.http.services.axon-fitness.loadbalancer.server.port: "8080"
+    mem_limit: 128m
+networks:
+  private:
+  edge:
+    external: true
+    name: ${TRAEFIK_NETWORK:?required}
+volumes:
+  axon-db:

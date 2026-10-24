@@ -1,0 +1,36 @@
+{
+  "name": "axon-fitness",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "web": "npm run web --workspace @axon/mobile",
+    "android": "npm run android --workspace @axon/mobile",
+    "api": "npm run dev --workspace @axon/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "vitest run",
+    "build:web": "npm run build:web --workspace @axon/mobile",
+    "build:api": "npm run build --workspace @axon/api",
+    "lint": "npm run lint --workspace @axon/mobile",
+    "format": "prettier --write apps/*/src packages/*/src docs *.md *.json *.ts compose.yml",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "preview": "node scripts/serve-web.mjs",
+    "db:up": "docker compose up -d db",
+    "migrate": "npm run migrate --workspace @axon/api"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.5",
+    "prettier": "^3.6.2"
+  },
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "overrides": {
+    "uuid": "^11.1.1",
+    "decode-uri-component": "^0.5.0"
+  }
+}

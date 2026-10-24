@@ -1,0 +1,29 @@
+{
+  "name": "@axon/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch --import tsx --env-file-if-exists=../../.env src/server.ts",
+    "start": "node --import tsx --env-file-if-exists=../../.env src/server.ts",
+    "migrate": "node --import tsx --env-file-if-exists=../../.env src/migrate.ts",
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@axon/core": "*",
+    "@better-auth/expo": "^1.7.10",
+    "better-auth": "^1.7.10",
+    "fastify": "^5.6.1",
+    "@fastify/cors": "^11.1.0",
+    "@fastify/rate-limit": "^10.3.0",
+    "pg": "^8.16.3",
+    "resend": "^6.4.0",
+    "tsx": "^4.20.6",
+    "@better-auth/core": "^1.7.10"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.15.5",
+    "@types/node": "^24.10.0"
+  }
+}

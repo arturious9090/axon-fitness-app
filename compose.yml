@@ -1,0 +1,17 @@
+name: axon-fitness-local
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: axon
+      POSTGRES_PASSWORD: axon_local_only
+      POSTGRES_DB: axon
+    ports: ["127.0.0.1:56437:5432"]
+    volumes: ["axon-local-db:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U axon -d axon"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+volumes:
+  axon-local-db:

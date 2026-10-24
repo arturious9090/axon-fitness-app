@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Axon Fitness",
+    "slug": "axon-fitness",
+    "scheme": "axonfitness",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/axon-icon.png",
+    "userInterfaceStyle": "dark",
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      "expo-secure-store"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "studio.axon.fitness",
+      "adaptiveIcon": {
+        "backgroundColor": "#0b1210",
+        "foregroundImage": "./assets/axon-icon.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/axon-icon.png"
+    }
+  }
+}

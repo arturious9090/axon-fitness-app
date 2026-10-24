@@ -1,0 +1,12 @@
+node_modules
+**/node_modules
+.git
+.cache
+.env
+.env.*
+!.env.example
+artifacts
+**/dist
+**/.expo
+apps/mobile/android
+apps/mobile/ios
